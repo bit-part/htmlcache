@@ -123,6 +123,10 @@ class HtmlcacheService extends Component
         if ($this->isPathExcluded()) {
             return false;
         }
+        // Skip if requested from login user
+        if (\Craft::$app->getUser()->getIdentity()) {
+            return false;
+        }
 
         return true;
     }
