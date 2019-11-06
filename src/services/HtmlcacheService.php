@@ -58,7 +58,8 @@ class HtmlcacheService extends Component
 
         // check if cache exists
         if ($cacheEntry) {
-            $file = $this->getCacheFileName($cacheEntry->uid);
+            $hashUri = hash('sha256', $cacheEntry->uri);
+            $file = $this->getCacheFileName($hashUri);
             if (file_exists($file)) {
                 // load cache - may return false if cache has expired
                 if ($this->loadCache($file)) {
@@ -195,7 +196,8 @@ class HtmlcacheService extends Component
                 if($this->settings->optimizeContent){
                     $content = implode("\n", array_map('trim', explode("\n", $content)));
                 }
-                $file = $this->getCacheFileName($cacheEntry->uid);
+                $hashUri = hash('sha256', $cacheEntry->uri);
+                $file = $this->getCacheFileName($hashUri);
                 $fp = fopen($file, 'w+');
                 if ($fp) {
                     fwrite($fp, $content);
@@ -227,7 +229,8 @@ class HtmlcacheService extends Component
         // get all possible caches
         $caches = HtmlCacheCache::findAll(['id' => $cacheIds]);
         foreach ($caches as $cache) {
-            $file = $this->getCacheFileName($cache->uid);
+            $hashUri = hash('sha256', $cache->uri);
+            $file = $this->getCacheFileName($hashUri);
             if (file_exists($file)) {
                 @unlink($file);
             }
@@ -253,12 +256,12 @@ class HtmlcacheService extends Component
     /**
      * Get the filename path
      *
-     * @param string $uid
+     * @param string $hashUri
      * @return string
      */
-    private function getCacheFileName($uid)
+    private function getCacheFileName($hashUri)
     {
-        return $this->getDirectory() . $uid . '.html';
+        return $this->getDirectory() . $hashUri . '.html';
     }
 
     /**
